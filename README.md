@@ -45,32 +45,35 @@ ORDER BY
     deviation ASC; -- Order to show the largest DROPS (negative deviation) first
 ```
 
-2. Challenge 3.2: Solve the Problem - Monitoring System Implementation
-A real-time monitoring and alerting system was implemented using Python/Flask with a Statistical Rule-Based Model to detect failure, denial, and reversal anomalies.
+## 2. Challenge 3.2: Solve the Problem - Monitoring System Implementation
 
-2.1. System Architecture and Anomaly Model
-Component	Technology / Concept	Function
-API Endpoint	Python (Flask)	POST /api/v1/monitor_txn. Receives aggregated transaction counts per minute (e.g., failed, denied, reversed).
-Anomaly Model	Statistical Rule-Based (3-Sigma)	Compares the current transaction failure rate to a predefined Historical Mean plus three Standard Deviations (μ+3σ). This method ensures alerts fire only on statistically significant deviations.
-Automatic Reporting	Python print() / Conceptual Logging	The system simulates automatic P0 incident logging and notification to response teams upon alert trigger.
+A real-time monitoring and alerting system was implemented using *Python/Flask* with a *Statistical Rule-Based Model*. The system meets all requirements by analyzing incoming transaction status data (failed, denied, reversed) against predefined thresholds.
 
-Defined Alert Thresholds (3-Sigma):
-| Status | Alert Threshold | Rationale |
+### 2.1. System Architecture and Anomaly Model
+
+| Component | Technology / Concept | Function |
 | :--- | :--- | :--- |
-| Failed Rate | 3.0% | High failure rate suggests a processor or service outage. |
-| Denied Rate | 8.0% | High denial rate often indicates an upstream provider issue or configuration error. |
-| Reversed Rate | 0.8% | High reversal rate suggests potential fraud or a system loop processing error. |
+| *API Endpoint* | Python (Flask) | POST /api/v1/monitor_txn. Receives aggregated transaction counts per minute. |
+| *Anomaly Model* | *Statistical Rule-Based (3-Sigma)* | Compares current failure rates to a historical mean ($\mu$) plus three standard deviations ($\mu + 3\sigma$). This ensures alerts fire only on significant deviations from normal operating conditions. |
+| *Automatic Reporting* | Python print() / Conceptual Logging | The check_for_anomaly function automatically logs a P0 incident when an alert is triggered, simulating a notification to teams (e.g., Slack, PagerDuty). |
 
-2.2. Query and Visualization
-Real-Time Monitoring Query (PromQL Concept):
-This PromQL query calculates the failure rate in a rolling window, a standard practice in monitoring tools like Prometheus, to detect real-time anomalies.
+*Defined Alert Thresholds (3-Sigma):*
+* *Failed Rate:* $3.0\%$
+* *Denied Rate:* $8.0\%$
+* *Reversed Rate:* $0.8\%$
 
+### 2.2. Query and Visualization
+
+*Real-Time Monitoring Query (PromQL Concept):*
+In a production environment, time-series databases are used. This PromQL query calculates the failure rate in a rolling window to detect real-time anomalies:
+
+```promql
 # PromQL Query to track the 5-minute average rate of failed transactions
-# and check if it's above the 3.0% threshold (0.03)
 (sum by (status) (rate(transaction_count_total{status="failed"}[5m])))
 /
 (sum by (status) (rate(transaction_count_total[5m])))
 > 0.03
+```
 
 Visualization Concept:
 The chart below illustrates how a simulated failure rate operates relative to the Alert Threshold (blue dashed line). Any data point exceeding the threshold triggers a CRITICAL alert.
