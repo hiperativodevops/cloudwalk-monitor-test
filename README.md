@@ -30,3 +30,37 @@ FROM sales_data_table
 WHERE  ABS(today - avg_last_week) > 5 
 ORDER BY deviation ASC;
 
+## 2. Challenge 3.2: Solve the Problem - Monitoring System Implementation
+
+A real-time monitoring and alerting system was implemented using *Python/Flask* with a *Statistical Rule-Based Model*. The system meets all requirements by analyzing incoming transaction status data (failed, denied, reversed) against predefined thresholds.
+
+### 2.1. System Architecture and Anomaly Model
+
+| Component | Technology / Concept | Function |
+| :--- | :--- | :--- |
+| *API Endpoint* | Python (Flask) | POST /api/v1/monitor_txn. Receives aggregated transaction counts per minute. |
+| *Anomaly Model* | *Statistical Rule-Based (3-Sigma)* | Compares current failure rates to a historical mean ($\mu$) plus three standard deviations ($\mu + 3\sigma$). This ensures alerts fire only on significant deviations from normal operating conditions. |
+| *Automatic Reporting* | Python print() / Conceptual Logging | The check_for_anomaly function automatically logs a P0 incident when an alert is triggered, simulating a notification to teams (e.g., Slack, PagerDuty). |
+
+*Defined Alert Thresholds (3-Sigma):*
+* *Failed Rate:* $3.0\%$
+* *Denied Rate:* $8.0\%$
+* *Reversed Rate:* $0.8\%$
+
+### 2.2. Query and Visualization
+
+*Real-Time Monitoring Query (PromQL Concept):*
+In a production environment, time-series databases are used. This PromQL query calculates the failure rate in a rolling window to detect real-time anomalies:
+
+```promql
+# PromQL Query to track the 5-minute average rate of failed transactions
+(sum by (status) (rate(transaction_count_total{status="failed"}[5m])))
+/
+(sum by (status) (rate(transaction_count_total[5m])))
+> 0.03
+
+### 2.3. Endpoint Functionality (Code Example)
+
+# Function simulates calling the anomaly model on new data
+# Input: {"total_transactions": 100, "failed_count": 5, ...}
+# Output for an anomaly: {"status": "ALERT", "recommendation": "P0_INCIDENT_TRIGGERED", "alerts": ["HIGH_FAILURE: Rate (5.00%) exceeded threshold (3.00%)."]}
