@@ -1,4 +1,4 @@
-CloudWalk Monitoring Analyst Challenge
+# CloudWalk Monitoring Analyst Challenge
 This repository contains the technical assessment deliverables for the CloudWalk Monitoring Analyst position. 
 The challenge is executed in two main parts: Data Analysis for Anomaly Detection (3.1) and Real-Time Alert System Implementation (3.2).
 
@@ -30,11 +30,11 @@ FROM sales_data_table
 WHERE  ABS(today - avg_last_week) > 5 
 ORDER BY deviation ASC;
 
-## 2. Challenge 3.2: Solve the Problem - Monitoring System Implementation
+# 2. Challenge - Solve the Problem - Monitoring System Implementation
 
 A real-time monitoring and alerting system was implemented using *Python/Flask* with a *Statistical Rule-Based Model*. The system meets all requirements by analyzing incoming transaction status data (failed, denied, reversed) against predefined thresholds.
 
-### 2.1. System Architecture and Anomaly Model
+# 2.1. System Architecture and Anomaly Model
 
 | Component | Technology / Concept | Function |
 | :--- | :--- | :--- |
@@ -58,6 +58,7 @@ In a production environment, time-series databases are used. This PromQL query c
 /
 (sum by (status) (rate(transaction_count_total[5m])))
 > 0.03
+
 
 ### 2.3. Endpoint Functionality (Code Example)
 
